@@ -5,7 +5,21 @@ exports.getList = function (req, res) {
     toDoListModel.find({})
         .then(function (data) {
             let listData = {
-                listData: data
+                listData: data,
+                listStatus: [
+                    {
+                        title: 'To do',
+                        value: 'toDo'
+                    },
+                    {
+                        title: 'Doing',
+                        value: 'doing'
+                    },
+                    {
+                        title: 'Done',
+                        value: 'done'
+                    }
+                ]
             }
             res.render('List/toDoList', listData)
         })
@@ -21,44 +35,30 @@ exports.create = function (req, res) {
         if (err) {
             return res.status(500).send(err);
         } else {
-            return res.redirect('/routes/list')
+            return res.redirect('/list')
         }
     })
+}
+
+exports.update = function (req, res) {
+    toDoListModel.updateOne(
+        { _id: req.params.id },
+        {
+            content: req.body.content,
+            status: req.body.status
+        })
+        .then(function () {
+            return res.redirect('/list')
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
 }
 
 exports.delete = function (req, res) {
     toDoListModel.deleteOne({ _id: req.params.id })
         .then(function () {
-            return res.redirect('/routes/list')
-        })
-        .catch(function (err) {
-            console.log(err);
-        })
-}
-
-exports.update = function (req, res) {
-    toDoListModel.updateOne({ _id: req.params.id }, { content: req.body.content })
-        .then(function () {
-            return res.redirect('/routes/list')
-        })
-        .catch(function (err) {
-            console.log(err);
-        })
-}
-
-exports.moveToDoing = function (req, res) {
-    toDoListModel.updateOne({ _id: req.params.id }, { status: 'doing' })
-        .then(function () {
-            return res.redirect('/routes/list')
-        })
-        .catch(function (err) {
-            console.log(err);
-        })
-}
-exports.moveToDone = function (req, res) {
-    toDoListModel.updateOne({ _id: req.params.id }, { status: 'done' })
-        .then(function () {
-            return res.redirect('/routes/list')
+            return res.redirect('/list')
         })
         .catch(function (err) {
             console.log(err);
